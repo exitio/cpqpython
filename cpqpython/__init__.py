@@ -54,7 +54,7 @@ class Client(object):
             cookies=cookies, **kwargs
         )
 
-    def login(self, username, password):
+    def login(self, username, password=None, gliderapikey=None):
         """Log the user into CPQ.
 
         :param username: The username of the user
@@ -62,13 +62,18 @@ class Client(object):
         :param password: The password of the user
         :type password: str
         :returns: requests.models.Response
+        :param gliderapikey: The Glider ApiKey
+        :type gliderapikey: str
 
         >>> client.login("user@name.com", "password")
+        >>> client.login("user@name.com", gliderapikey="1234")
         """
-        resp = self.request("POST", "/cpq/login", {
-            "username": username,
-            "password": password
-        })
+        data = {"username": username}
+        if gliderapikey:
+            data["gliderapikey"] = gliderapikey
+        else:
+            data["password"] = password
+        resp = self.request("POST", "/cpq/login", data)
         if resp.status_code == 200:
             # Get the JSESSIONID for later requests
             self.session_id = resp.cookies.get("JSESSIONID", None)
@@ -90,9 +95,9 @@ class Client(object):
         :param associated_id: The ID for a Opportunity, Quote or ConfiguredProduct object.
         :type associated_id: str
 
-        >>> client.get_printable_proposal("proposal")
-        >>> client.get_printable_proposal("proposal", item_id="item")
-        >>> client.get_printable_proposal("proposal", associated_id="assoc")
+        >>> client.get_printable_proposal("10a000012a6ijitj")
+        >>> client.get_printable_proposal("10a000012a6ijitj", item_id="item")
+        >>> client.get_printable_proposal("10a000012a6ijitj", associated_id="assoc")
         """
         params = {}
         if item_id:
