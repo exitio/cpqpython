@@ -14,6 +14,9 @@ class Client(object):
     :type password: str
 
     If username and password are present, we automatically call :func:`login`.
+
+    >>> client = Client()
+    >>> client = Client(username="user@name.com", password="password")
     """
     server_name = None
     version = None
@@ -21,7 +24,7 @@ class Client(object):
     session_id = None
 
     def __init__(
-        self, server_name="http://cobalt.fpx.com:8080", version="7",
+        self, server_name=None, version="7",
         username=None, password=None
     ):
         self.server_name = server_name

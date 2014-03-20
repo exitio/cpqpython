@@ -14,7 +14,6 @@ Contents:
    client
 
 
-
 Indices and tables
 ==================
 
