@@ -1,5 +1,9 @@
 import requests
 import json
+try:
+    from urllib.parse import quote_plus
+except ImportError:
+    from urllib import quote_plus
 
 class Client(object):
     """The CPQ Rest API Client.
@@ -108,4 +112,16 @@ class Client(object):
             "GET",
             "/cpqproposal/{0}/printable".format(proposal_id),
             params=params
+        )
+
+    def query(self, query):
+        """Perform a query on the CPQ Api.
+
+        :param query: The query to call on the CPQ API
+        :type query: str
+
+        >>> client.query("Select ShippingCity from Account")
+        """
+        return self.request(
+            "GET", "/cpq", params={'query': query}
         )
