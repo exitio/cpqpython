@@ -125,3 +125,8 @@ class Client(object):
         return self.request(
             "GET", "/cpq", params={'query': query}
         )
+
+    def update(self, object_id, data={}):
+        return self.request(
+            "PUT", "/cpq/{0}".format(object_id), data
+        )
