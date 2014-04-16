@@ -114,7 +114,7 @@ class Client(object):
             params=params
         )
 
-    def query(self, query):
+    def query(self, query, batchsize=200):
         """Perform a query on the CPQ Api.
 
         :param query: The query to call on the CPQ API
@@ -123,7 +123,7 @@ class Client(object):
         >>> client.query("Select ShippingCity from Account")
         """
         return self.request(
-            "GET", "/cpq", params={'query': query}
+            "GET", "/cpq", params={'query': query, 'batchsize': batchsize}
         )
 
     def update(self, object_id, data={}):
