@@ -130,3 +130,12 @@ class Client(object):
         return self.request(
             "PUT", "/cpq/{0}".format(object_id), data
         )
+
+    def get_primary_contact(self, proposal_id, useExportUser=False):
+        return self.request(
+            "GET", "/cpqproposal/{0}/primarycontact".format(
+                proposal_id
+            ), {
+                'useExportUser': useExportUser
+            }
+        )
