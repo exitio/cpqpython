@@ -1,5 +1,6 @@
 import requests
 import json
+import sys
 try:
     from urllib.parse import quote_plus
 except ImportError:
@@ -29,11 +30,13 @@ class Client(object):
 
     def __init__(
         self, server_name=None, version="7",
-        username=None, password=None
+        username=None, password=None,
+        debug=False
     ):
         self.server_name = server_name
         self.version = version
         self.base_path = "/rs/{0}".format(version)
+        self.debug = debug
         if username and password:
             self.login(username, password)
 
@@ -53,10 +56,28 @@ class Client(object):
         headers.update({"content-type": "application/json"})
         if self.session_id:
             cookies['JSESSIONID'] = self.session_id
-        return requests.request(
+        if self.debug:
+            print >> sys.stderr, "Request:"
+            print >> sys.stderr, method + ' ' + url
+            print >> sys.stderr, "Headers:"
+            for headerkey in headers.keys():
+                print >> sys.stderr, headerkey + ': ' + headers[headerkey]
+            print >> sys.stderr, "Cookies:"
+            for cookiekey in cookies.keys():
+                print >> sys.stderr, cookiekey + ': ' + cookies[cookiekey]
+        response = requests.request(
             method, url, data=json.dumps(data), headers=headers,
             cookies=cookies, **kwargs
         )
+        if self.debug:
+            print >> sys.stderr, "Response:"
+            print >> sys.stderr, str(response.status_code) + ' ' + response.reason
+            print >> sys.stderr, "Headers:"
+            for headerkey in headers.keys():
+                print >> sys.stderr, headerkey + ': ' + headers[headerkey]
+            print >> sys.stderr, "Body:"
+            print >> sys.stderr, response.text
+        return response
 
     def login(self, username, password=None, gliderapikey=None):
         """Log the user into CPQ.
