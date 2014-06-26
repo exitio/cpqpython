@@ -6,6 +6,12 @@ try:
 except ImportError:
     from urllib import quote_plus
 
+def _paranoid_print(msg):
+    try:
+        print >> sys.stderr, msg
+    except:
+        print >> sys.stderr, "Couldn't print the message; it's probably an encoding error of some sort."
+
 class Client(object):
     """The CPQ Rest API Client.
 
@@ -57,26 +63,26 @@ class Client(object):
         if self.session_id:
             cookies['JSESSIONID'] = self.session_id
         if self.debug:
-            print >> sys.stderr, "Request:"
-            print >> sys.stderr, method + ' ' + url
-            print >> sys.stderr, "Headers:"
+            _paranoid_print("Request:")
+            _paranoid_print(method + ' ' + url)
+            _paranoid_print("Headers:")
             for headerkey in headers.keys():
-                print >> sys.stderr, headerkey + ': ' + headers[headerkey]
-            print >> sys.stderr, "Cookies:"
+                _paranoid_print(headerkey + ': ' + headers[headerkey])
+            _paranoid_print("Cookies:")
             for cookiekey in cookies.keys():
-                print >> sys.stderr, cookiekey + ': ' + cookies[cookiekey]
+                _paranoid_print(cookiekey + ': ' + cookies[cookiekey])
         response = requests.request(
             method, url, data=json.dumps(data), headers=headers,
             cookies=cookies, **kwargs
         )
         if self.debug:
-            print >> sys.stderr, "Response:"
-            print >> sys.stderr, str(response.status_code) + ' ' + response.reason
-            print >> sys.stderr, "Headers:"
+            _paranoid_print("Response:")
+            _paranoid_print(str(response.status_code) + ' ' + response.reason)
+            _paranoid_print("Headers:")
             for headerkey in headers.keys():
-                print >> sys.stderr, headerkey + ': ' + headers[headerkey]
-            print >> sys.stderr, "Body:"
-            print >> sys.stderr, response.text
+                _paranoid_print(headerkey + ': ' + headers[headerkey])
+            _paranoid_print("Body:")
+            _paranoid_print(response.text)
         return response
 
     def login(self, username, password=None, gliderapikey=None):
