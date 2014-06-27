@@ -33,6 +33,7 @@ class Client(object):
     version = None
     base_path = None
     session_id = None
+    client = None
 
     def __init__(
         self, server_name=None, version="7",
@@ -108,6 +109,7 @@ class Client(object):
         if resp.status_code == 200:
             # Get the JSESSIONID for later requests
             self.session_id = resp.cookies.get("JSESSIONID", None)
+        self.client = resp
         return resp
 
     def logout(self):
@@ -149,9 +151,19 @@ class Client(object):
 
         >>> client.query("Select ShippingCity from Account")
         """
-        return self.request(
+        resp = self.request(
             "GET", "/cpq", params={'query': query, 'batchsize': batchsize}
         )
+
+        if resp.status_code != 200:
+            return None
+
+        try:
+            resp_json = resp.json()
+        except ValueError:
+            return None
+
+        return resp_json
 
     def update(self, object_id, data={}):
         return self.request(
@@ -159,7 +171,7 @@ class Client(object):
         )
 
     def get_primary_contact(self, proposal_id, useExportUser=False):
-        return self.request(
+        res = self.request(
             "GET", "/cpqproposal/{0}/primarycontact".format(
                 proposal_id
             ), {
@@ -174,3 +186,33 @@ class Client(object):
             return res_json['records'][0].get('ExternalId', None)
         except:
             return None
+
+    def get_quote(self, quoteId):
+        res = self.client.query(
+            "SELECT Name, TotalAmount, Opportunity.Id, Opportunity.Name \
+             FROM Quote WHERE Id = '{0}'".format(quoteId)
+        )
+
+        if res.get('size') <= 0:
+            return None
+
+        return res['records'][0]
+        
+
+    def get_quote_proposals(self, quoteId):
+        res = self.client.query(
+            "SELECT Id, Name from Proposal WHERE QuoteId = '{0}'".format(
+                quoteId)
+            )
+
+        if not res or res.get('size') <= 0
+            return None
+
+        return res['records']
+
+    def get_account(self, opportunityId, sfContact):
+        res = self.client.request(
+            "GET", "/cpqopportunity/{0}/account".format(opportunityId),
+            {'useExportUser': sfContact}
+        )
+        return res.get('account', None)
