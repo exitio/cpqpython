@@ -86,6 +86,9 @@ class Client(object):
             _paranoid_print(response.text)
         return response
 
+    def __del__(self):
+        self.logout()
+
     def login(self, request, password=None):
         """Log the user into CPQ.
 
