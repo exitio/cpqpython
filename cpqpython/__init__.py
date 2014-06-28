@@ -86,7 +86,7 @@ class Client(object):
             _paranoid_print(response.text)
         return response
 
-    def login(self, username, password=None, gliderapikey=None):
+    def login(self, request, password=None):
         """Log the user into CPQ.
 
         :param username: The username of the user
@@ -97,18 +97,23 @@ class Client(object):
         :param gliderapikey: The Glider ApiKey
         :type gliderapikey: str
 
-        >>> client.login("user@name.com", "password")
-        >>> client.login("user@name.com", gliderapikey="1234")
+        >>> client.login(request, "password")
+        >>> client.login(request, gliderapikey="1234")
         """
+        username = request.user.email
         data = {"username": username}
-        if gliderapikey:
-            data["gliderapikey"] = gliderapikey
+        if request.user.api_key.key:
+            data["gliderapikey"] = request.user.api_key.key
         else:
             data["password"] = password
         resp = self.request("POST", "/cpq/login", data)
-        if resp.status_code == 200:
+        if request.GET.get('sId'):
+            self.session_id = request.GET['sId']
+        elif resp.status_code == 200 and resp.json().get('success', False):
             # Get the JSESSIONID for later requests
             self.session_id = resp.cookies.get("JSESSIONID", None)
+        else:
+            return None
         self.client = resp
         return resp
 
