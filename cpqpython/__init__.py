@@ -166,3 +166,11 @@ class Client(object):
                 'useExportUser': useExportUser
             }
         )
+
+    def get_opportunity_external_id(self, opportunity_id):
+        res = self.query("Select ExternalId From Opportunity Where Id='{0}'".format(opportunity_id))
+        try:
+            res_json = res.json()
+            return res_json['records'][0].get('ExternalId', None)
+        except:
+            return None

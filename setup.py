@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='cpqpython',
-    version='0.0.6',
+    version='0.0.7',
     description='Python wrapper for CPQ REST API',
     long_description='',
     author='Cameron Stitt',
