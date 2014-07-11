@@ -45,8 +45,6 @@ class Client(object):
         self.session_id = session_id
         self.base_path = "/rs/{0}".format(version)
         self.debug = debug
-        if username and password:
-            self.login(username, password)
 
     def request(self, method, path, data=None, **kwargs):
         """The base request builder.
