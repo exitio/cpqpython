@@ -38,10 +38,11 @@ class Client(object):
     def __init__(
         self, server_name=None, version="7",
         username=None, password=None,
-        debug=False
+        debug=False, session_id=None
     ):
         self.server_name = server_name
         self.version = version
+        self.session_id = session_id
         self.base_path = "/rs/{0}".format(version)
         self.debug = debug
         if username and password:
