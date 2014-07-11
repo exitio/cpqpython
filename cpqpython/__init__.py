@@ -226,7 +226,7 @@ class Client(object):
         )
         return res.get('account', None)
 
-    def put_details_details(deal):
+    def put_deals_details(deal):
         resp = self.update(deal.cpq_opportunity_id, {'DealId': deal.pk})
         return resp.status_code == 200
 
