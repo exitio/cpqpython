@@ -88,7 +88,7 @@ class Client(object):
     def __del__(self):
         self.logout()
 
-    def login(self, request, password=None):
+    def login(self, username, password=None, gliderapikey=None):
         """Log the user into CPQ.
 
         :param username: The username of the user
@@ -101,17 +101,20 @@ class Client(object):
 
         >>> client.login(request, "password")
         >>> client.login(request, gliderapikey="1234")
+        >>> client.login(username, password=None, gliderapikey=None)
         """
-        username = request.user.email
+        if not username or not any([password, gliderapikey]):
+            raise TypeError('You must specify a username and either a \
+                gliderapikey or password to login.')
         data = {"username": username}
         if request.user.api_key.key:
-            data["gliderapikey"] = request.user.api_key.key
+            data["gliderapikey"] = gliderapikey
         else:
             data["password"] = password
         resp = self.request("POST", "/cpq/login", data)
         if request.GET.get('sId'):
             self.session_id = request.GET['sId']
-        elif resp.status_code == 200 and resp.json().get('success', False):
+        elif all([resp.status_code == 200, resp.json().get('success', False)]):
             # Get the JSESSIONID for later requests
             self.session_id = resp.cookies.get("JSESSIONID", None)
         else:
