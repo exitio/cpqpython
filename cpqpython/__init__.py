@@ -175,9 +175,9 @@ class Client(object):
         return resp_json
 
     def update(self, object_id, data={}):
-        return self.request(
-            "PUT", "/cpq/{0}".format(object_id), data
-        )
+        resp = self.request("PUT", "/cpq/{0}".format(object_id), data)
+        return resp.status_code == 200
+
 
     def get_primary_contact(self, proposal_id, useExportUser=False):
         res = self.request(
@@ -227,9 +227,7 @@ class Client(object):
         return res.get('account', None)
 
     def put_deals_details(deal):
-        resp = self.update(deal.cpq_opportunity_id, {'DealId': deal.pk})
-        return resp.status_code == 200
+        return self.update(deal.cpq_opportunity_id, {'DealId': deal.pk})
 
     def put_document_details(document):
-        resp = self.update(doc.cpq_proposal_id, {'DocumentId': doc.pk})
-        return resp.status_code == 200
+        return self.update(doc.cpq_proposal_id, {'DocumentId': doc.pk})
