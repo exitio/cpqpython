@@ -95,9 +95,9 @@ class Client(object):
         :type username: str
         :param password: The password of the user
         :type password: str
-        :returns: requests.models.Response
         :param gliderapikey: The Glider ApiKey
         :type gliderapikey: str
+        :returns: True if logging in was successful
 
         >>> client.login(request, "password")
         >>> client.login(request, gliderapikey="1234")
@@ -118,9 +118,9 @@ class Client(object):
             # Get the JSESSIONID for later requests
             self.session_id = resp.cookies.get("JSESSIONID", None)
         else:
-            return None
+            return False
         self.client = resp
-        return resp
+        return True
 
     def logout(self):
         """Log the user out of CPQ."""
