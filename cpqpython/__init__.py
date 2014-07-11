@@ -225,3 +225,11 @@ class Client(object):
             {'useExportUser': sfContact}
         )
         return res.get('account', None)
+
+    def put_details_details(deal):
+        resp = self.update(deal.cpq_opportunity_id, {'DealId': deal.pk})
+        return resp.status_code == 200
+
+    def put_document_details(document):
+        resp = self.update(doc.cpq_proposal_id, {'DocumentId': doc.pk})
+        return resp.status_code == 200
