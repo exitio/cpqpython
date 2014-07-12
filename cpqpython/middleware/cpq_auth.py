@@ -12,14 +12,16 @@ class CPQAuthMiddleware(object):
     user if they're not already logged in.
     """
     def process_request(self, request):
-        current_user = request.user
+        current_user, user, jsessionid, email = (
+            request.user,
+            None,
+            request.GET.get('sId', None),
+            request.GET.get('un', None)
+        )
 
-        user = None
-
-        jsessionid = request.GET.get('sId', None)
         if jsessionid:
             request.session['jsessionid'] = jsessionid
-        email = request.GET.get('un', None)
+
 
         if not any([jsessionid, email]):
             return
@@ -28,6 +30,7 @@ class CPQAuthMiddleware(object):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return
+
         if user.is_active:
             if not user == current_user:
                 logout(request)
