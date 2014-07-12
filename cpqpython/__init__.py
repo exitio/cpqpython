@@ -181,13 +181,14 @@ class Client(object):
 
 
     def get_primary_contact(self, proposal_id, useExportUser=False):
-        res = self.request(
+        resp = self.request(
             "GET", "/cpqproposal/{0}/primarycontact".format(
                 proposal_id
             ), {
                 'useExportUser': useExportUser
             }
         )
+        return resp
 
     def get_opportunity_external_id(self, opportunity_id):
         """Grabs the SFDC ("ExternalId) using the opportunity id.
@@ -199,10 +200,10 @@ class Client(object):
         >>> client.get_opportunity_external_id(opportunityId)
         """
         query = "SELECT ExternalId FROM Opportunity WHERE Id='{0}'"
-        res = self.query(query.format(opportunity_id))
+        resp = self.query(query.format(opportunity_id))
         try:
-            res_json = res.json()
-            return res_json['records'][0].get('ExternalId', None)
+            resp_json = resp.json()
+            return resp_json['records'][0]['ExternalId']
         except (IndexError, ValueError):
             return None
 
@@ -214,15 +215,15 @@ class Client(object):
 
         >>> client.get_quote(quoteId)
         """
-        res = self.client.query(
+        resp = self.client.query(
             "SELECT Name, TotalAmount, Opportunity.Id, Opportunity.Name \
              FROM Quote WHERE Id = '{0}'".format(quoteId)
         )
 
-        if res.get('size') <= 0:
+        if resp.get('size') <= 0:
             return None
 
-        return res['records'][0]
+        return resp['records'][0]
         
 
     def get_quote_proposals(self, quoteId):
@@ -233,22 +234,22 @@ class Client(object):
 
         >>> client.get_quote_proposals
         """
-        res = self.client.query(
+        resp = self.client.query(
             "SELECT Id, Name from Proposal WHERE QuoteId = '{0}'".format(
                 quoteId)
             )
 
-        if not res or res.get('size') <= 0
+        if not resp or resp.get('size') <= 0:
             return None
 
-        return res['records']
+        return resp['records']
 
     def get_account(self, opportunityId, sfContact):
-        res = self.client.request(
+        resp = self.client.request(
             "GET", "/cpqopportunity/{0}/account".format(opportunityId),
             {'useExportUser': sfContact}
         )
-        return res.get('account', None)
+        return resp.get('account', None)
 
     def put_deals_details(deal):
         return self.update(deal.cpq_opportunity_id, {'DealId': deal.pk})
