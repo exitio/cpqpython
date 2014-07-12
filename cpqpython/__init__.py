@@ -256,3 +256,9 @@ class Client(object):
 
     def put_document_details(document):
         return self.update(doc.cpq_proposal_id, {'DocumentId': doc.pk})
+
+    def export_cpq_quote(deal_opportunity_id):
+        return self.request('GET', '/cpq/{0}/export'.format(
+            deal.cpq_opportunity_id),
+            {'useExportUser': True}
+        )
