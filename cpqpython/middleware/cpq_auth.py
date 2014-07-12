@@ -43,7 +43,7 @@ class CPQAuthMiddleware(object):
                 session_id=jsessionid
             )
             resp = client.query('SELECT Id FROM Opportunity', batchsize=1)
-            if resp.status_code == 200:
+            if resp:
                 auth_user = authenticate(
                     username=user.email, password=user.api_key.key
                 )
