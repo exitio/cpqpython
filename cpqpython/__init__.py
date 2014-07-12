@@ -190,14 +190,30 @@ class Client(object):
         )
 
     def get_opportunity_external_id(self, opportunity_id):
-        res = self.query("Select ExternalId From Opportunity Where Id='{0}'".format(opportunity_id))
+        """Grabs the SFDC ("ExternalId) using the opportunity id.
+        Allows Glider to create a link to SFDC Opportunity.
+
+        :param opportunity_id: Opportunity.Id from CPQ.
+        :type opportunity_id: str
+
+        >>> client.get_opportunity_external_id(opportunityId)
+        """
+        query = "SELECT ExternalId FROM Opportunity WHERE Id='{0}'"
+        res = self.query(query.format(opportunity_id))
         try:
             res_json = res.json()
             return res_json['records'][0].get('ExternalId', None)
-        except:
+        except (IndexError, ValueError):
             return None
 
     def get_quote(self, quoteId):
+        """Grab details about a quote given the quoteId.
+
+        :param quoteId: Quote.Id from CPQ.
+        :type quoteId: str
+
+        >>> client.get_quote(quoteId)
+        """
         res = self.client.query(
             "SELECT Name, TotalAmount, Opportunity.Id, Opportunity.Name \
              FROM Quote WHERE Id = '{0}'".format(quoteId)
@@ -210,6 +226,13 @@ class Client(object):
         
 
     def get_quote_proposals(self, quoteId):
+        """Get information regarding proposals with quoteId
+
+        :param quoteId: Proposal.QuoteId
+        :type quoteId: str
+
+        >>> client.get_quote_proposals
+        """
         res = self.client.query(
             "SELECT Id, Name from Proposal WHERE QuoteId = '{0}'".format(
                 quoteId)
