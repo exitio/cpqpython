@@ -46,7 +46,7 @@ class Client(object):
         self.gliderapikey = gliderapikey
         if username and password:
             self.login(username, password)
-        else if username and gliderapikey:
+        elif username and gliderapikey:
             self.login(username, gliderapikey=gliderapikey) 
 
     def request(self, method, path, data=None, **kwargs):
