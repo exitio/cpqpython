@@ -37,14 +37,17 @@ class Client(object):
     def __init__(
         self, server_name=None, version="7",
         username=None, password=None,
-        debug=False
+        debug=False, gliderapikey=None
     ):
         self.server_name = server_name
         self.version = version
         self.base_path = "/rs/{0}".format(version)
         self.debug = debug
+        self.gliderapikey = gliderapikey
         if username and password:
             self.login(username, password)
+        elif username and gliderapikey:
+            self.login(username, gliderapikey=gliderapikey) 
 
     def request(self, method, path, data=None, **kwargs):
         """The base request builder.
@@ -174,3 +177,11 @@ class Client(object):
             return res_json['records'][0].get('ExternalId', None)
         except:
             return None
+
+    def export_to_cpq_app(self, app_url=None, data={}):
+        """ Used for exporting data to a cpq/sfdc app extension, which 
+            will be a different url than a typical cpq api request
+        """
+        headers = {'gliderapikey': self.gliderapikey}
+        cookies = {'JSESSIONID': self.session_id}
+        return requests.post(app_url, headers=headers, cookies=cookies, data=data) 
