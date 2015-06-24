@@ -156,7 +156,10 @@ class Client(object):
             "GET", "/cpq", params={'query': query, 'batchsize': batchsize}
         )
 
-    def update(self, object_id, data={}):
+    def update(self, object_id, data=None):
+        """Update a CPQ object."""
+        if not data:
+            data = {}
         return self.request(
             "PUT", "/cpq/{0}".format(object_id), data
         )
@@ -178,10 +181,12 @@ class Client(object):
         except:
             return None
 
-    def export_to_cpq_app(self, app_url=None, data={}):
+    def export_to_cpq_app(self, app_url=None, data=None):
         """ Used for exporting data to a cpq/sfdc app extension, which 
             will be a different url than a typical cpq api request
         """
         headers = {'gliderapikey': self.gliderapikey}
         cookies = {'JSESSIONID': self.session_id}
+        if not data:
+            data = {}
         return requests.post(app_url, headers=headers, cookies=cookies, data=data) 
