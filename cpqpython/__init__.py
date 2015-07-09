@@ -185,8 +185,14 @@ class Client(object):
         """ Used for exporting data to a cpq/sfdc app extension, which 
             will be a different url than a typical cpq api request
         """
-        headers = {'gliderapikey': self.gliderapikey}
-        cookies = {'JSESSIONID': self.session_id}
+        headers = {'content-type': 'application/json'}
+        
+        # Set query string parameters for authentication
+        app_ext_path = '/ws/14/'
+        params = {
+            'appext.cpq.session': self.session_id,
+            'appext.cpq.url': ''.join([self.server_name.rstrip('/'), app_ext_path])
+        }
         if not data:
             data = {}
-        return requests.post(app_url, headers=headers, cookies=cookies, data=data) 
+        return requests.post(app_url, params=params, headers=headers, data=json.dumps(data)) 
