@@ -1,16 +1,14 @@
 import requests
 import json
 import sys
-try:
-    from urllib.parse import quote_plus
-except ImportError:
-    from urllib import quote_plus
+
 
 def _paranoid_print(msg):
     try:
         print >> sys.stderr, msg
     except:
         print >> sys.stderr, "Couldn't print the message; it's probably an encoding error of some sort."
+
 
 class Client(object):
     """The CPQ Rest API Client.
@@ -47,7 +45,7 @@ class Client(object):
         if username and password:
             self.login(username, password)
         elif username and gliderapikey:
-            self.login(username, gliderapikey=gliderapikey) 
+            self.login(username, gliderapikey=gliderapikey)
 
     def request(self, method, path, data=None, **kwargs):
         """The base request builder.
@@ -182,17 +180,29 @@ class Client(object):
             return None
 
     def export_to_cpq_app(self, app_url=None, data=None):
-        """ Used for exporting data to a cpq/sfdc app extension, which 
+        """ Used for exporting data to a cpq/sfdc app extension, which
             will be a different url than a typical cpq api request
         """
         headers = {'content-type': 'application/json'}
-        
+
         # Set query string parameters for authentication
         app_ext_path = '/ws/14/'
-        params = {
-            'appext.cpq.session': self.session_id,
-            'appext.cpq.url': ''.join([self.server_name.rstrip('/'), app_ext_path])
-        }
+
+        # NOTE: (darwinhang) We were originally using a dict for the params,
+        # which makes for cleaner code, but 'requests' automatically uriencodes
+        # the params. This is a problem when working with the cpq sfdc app
+        # extensions, because the app extensions are also encoding the url.
+        # Since it is much easier for us to make code changes, we are now
+        # passing in a string, which won't be uriencoded.
+        jsessionid = self.session_id
+        cpq_app_url = ''.join([self.server_name.rstrip('/'), app_ext_path])
+        querystring = 'appext.cpq.session={jsessionid}&appext.cpq.url={cpq_app_url}'
+
         if not data:
             data = {}
-        return requests.post(app_url, params=params, headers=headers, data=json.dumps(data)) 
+        return requests.post(
+            app_url,
+            params=querystring.format(jsessionid=jsessionid, cpq_app_url=cpq_app_url),
+            headers=headers,
+            data=json.dumps(data)
+        )
