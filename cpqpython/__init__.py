@@ -33,7 +33,7 @@ class Client(object):
     session_id = None
 
     def __init__(
-        self, server_name=None, version="7",
+        self, server_name=None, version="15",
         username=None, password=None,
         debug=False, gliderapikey=None
     ):
