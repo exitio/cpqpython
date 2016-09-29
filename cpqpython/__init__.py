@@ -141,7 +141,7 @@ class Client(object):
             params['itemId'] = item_id
         if associated_id:
             params['associatedId'] = associated_id
-        path = "/cpqproposal/{0}/printable".format(proposal_id)
+        path = "/cpq/proposal/{0}/printable".format(proposal_id)
         logger.error('path: {}'.format(path))
         logger.error('params: {}'.format(params))
         response = self.request("GET", path, params=params)
