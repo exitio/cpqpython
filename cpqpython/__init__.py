@@ -1,8 +1,13 @@
 import requests
 import json
 import sys
+import logging
+# NOTE All logs are at level error for convinience until we have time to setup logging
+# appropriately
+logger = logging.getLogger(__name__)
 
 
+# TODO This looks really dumb, Sorry Darwin :), we should replace with loggin
 def _paranoid_print(msg):
     try:
         print >> sys.stderr, msg
@@ -115,9 +120,7 @@ class Client(object):
         """Log the user out of CPQ."""
         return self.request("POST", "/cpq/logout")
 
-    def get_printable_proposal(
-        self, proposal_id, item_id=None, associated_id=None
-    ):
+    def get_printable_proposal(self, proposal_id, item_id=None, associated_id=None):
         """Retreive a printable proposal.
 
         :param proposal_id: The ID of the proposal
@@ -131,16 +134,23 @@ class Client(object):
         >>> client.get_printable_proposal("10a000012a6ijitj", item_id="item")
         >>> client.get_printable_proposal("10a000012a6ijitj", associated_id="assoc")
         """
+        logger.error('get_printable_proposal')
         params = {}
         if item_id:
             params['itemId'] = item_id
         if associated_id:
             params['associatedId'] = associated_id
-        return self.request(
-            "GET",
-            "/cpqproposal/{0}/printable".format(proposal_id),
-            params=params
-        )
+        path = "/cpqproposal/{0}/printable".format(proposal_id)
+        logger.error('path: {}'.format(path))
+        logger.error('params: {}'.format(params))
+        response = self.request("GET", path, params=params)
+
+        if response.status_code != 200:
+            logger.error('Problem with getting the proposal, status code: {}'.format(
+                response.status_code))
+            logger.error('Response content on next line:\n{}'.format(response.content))
+
+        return response
 
     def query(self, query, batchsize=200):
         """Perform a query on the CPQ Api.
