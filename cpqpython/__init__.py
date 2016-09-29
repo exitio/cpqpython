@@ -63,6 +63,7 @@ class Client(object):
         :type data: dict
         """
         url = "{0}{1}{2}".format(self.server_name, self.base_path, path)
+        logger.error('Full url for request: {}'.format(url))
         headers = kwargs.pop('headers', {})
         cookies = kwargs.pop('cookies', {})
         headers.update({"content-type": "application/json"})
